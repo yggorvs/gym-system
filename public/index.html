@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏋️ GymPro - Sistema de Academia</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h1>💪 GymPro</h1>
+      <p>Sistema de Gestão</p>
+    </div>
+    <nav>
+      <a href="#" class="nav-link active" data-page="dashboard">
+        <span class="icon">📊</span> Dashboard
+      </a>
+      <a href="#" class="nav-link" data-page="alunos">
+        <span class="icon">👥</span> Alunos
+      </a>
+      <a href="#" class="nav-link" data-page="planos">
+        <span class="icon">📋</span> Planos
+      </a>
+      <a href="#" class="nav-link" data-page="presencas">
+        <span class="icon">✅</span> Presenças
+      </a>
+      <a href="#" class="nav-link" data-page="pagamentos">
+        <span class="icon">💰</span> Pagamentos
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <p>© 2024 GymPro v1.0</p>
+    </div>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="main-content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <section id="page-dashboard" class="page active">
+      <header class="page-header">
+        <h2>📊 Dashboard</h2>
+        <p>Visão geral da sua academia</p>
+      </header>
+
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <h3 id="dash-total-alunos">0</h3>
+            <p>Alunos Ativos</p>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <h3 id="dash-presencas-hoje">0</h3>
+            <p>Presenças Hoje</p>
+          </div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <h3 id="dash-receita-mes">R$ 0</h3>
+            <p>Receita do Mês</p>
+          </div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <h3 id="dash-media-mensal">R$ 0</h3>
+            <p>Média Mensal</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>🏆 Planos Mais Populares</h3>
+          <div id="dash-planos-populares" class="lista-populares"></div>
+        </div>
+        <div class="card">
+          <h3>📊 Faturamento (Últimos 6 meses)</h3>
+          <div id="dash-faturamento" class="faturamento-chart"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ALUNOS ===== -->
+    <section id="page-alunos" class="page">
+      <header class="page-header">
+        <div>
+          <h2>👥 Gestão de Alunos</h2>
+          <p>Cadastre e gerencie seus alunos</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-aluno')">
+          ➕ Novo Aluno
+        </button>
+      </header>
+
+      <div class="card">
+        <div class="search-bar">
+          <input type="text" id="search-alunos" placeholder="🔍 Buscar aluno por nome, email ou CPF..."
+                 oninput="filtrarAlunos()">
+          <select id="filter-status" onchange="filtrarAlunos()">
+            <option value="">Todos os Status</option>
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+            <option value="pendente">Pendente</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Telefone</th>
+                <th>Plano</th>
+                <th>Início</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-alunos">
+              <tr><td colspan="8" class="loading">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PLANOS ===== -->
+    <section id="page-planos" class="page">
+      <header class="page-header">
+        <div>
+          <h2>📋 Planos</h2>
+          <p>Gerencie os planos da academia</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-plano')">
+          ➕ Novo Plano
+        </button>
+      </header>
+
+      <div class="planos-grid" id="planos-grid">
+        <!-- Planos carregados via JS -->
+      </div>
+    </section>
+
+    <!-- ===== PRESENÇAS ===== -->
+    <section id="page-presencas" class="page">
+      <header class="page-header">
+        <h2>✅ Registro de Presença</h2>
+        <p>Controle de entrada e saída</p>
+      </header>
+
+      <div class="card">
+        <div class="presenca-controls">
+          <div class="form-group">
+            <label>Selecione o Aluno:</label>
+            <select id="presenca-aluno">
+              <option value="">-- Selecione --</option>
+            </select>
+          </div>
+          <div class="presenca-buttons">
+            <button class="btn btn-success" onclick="registrarEntrada()">
+              🟢 Registrar Entrada
+            </button>
+            <button class="btn btn-warning" onclick="registrarSaida()">
+              🟡 Registrar Saída
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📋 Histórico de Presenças</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Aluno</th>
+                <th>Data</th>
+                <th>Entrada</th>
+                <th>Saída</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-presencas">
+              <tr><td colspan="5" class="loading">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PAGAMENTOS ===== -->
+    <section id="page-pagamentos" class="page">
+      <header class="page-header">
+        <div>
+          <h2>💰 Pagamentos</h2>
+          <p>Registre e acompanhe pagamentos</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-pagamento')">
+          💵 Novo Pagamento
+        </button>
+      </header>
+
+      <div class="card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Aluno</th>
+                <th>Valor</th>
+                <th>Data</th>
+                <th>Método</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-pagamentos">
+              <tr><td colspan="5" class="loading">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== MODAIS ===== -->
+
+  <!-- Modal Aluno -->
+  <div id="modal-aluno" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-aluno-titulo">Cadastrar Aluno</h3>
+        <button class="btn-close" onclick="closeModal('modal-aluno')">&times;</button>
+      </div>
+      <form id="form-aluno" onsubmit="salvarAluno(event)">
+        <input type="hidden" id="aluno-id">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nome Completo *</label>
+            <input type="text" id="aluno-nome" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="aluno-email">
+          </div>
+          <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" id="aluno-telefone" placeholder="(00) 00000-0000">
+          </div>
+          <div class="form-group">
+            <label>CPF</label>
+            <input type="text" id="aluno-cpf" placeholder="000.000.000-00">
+          </div>
+          <div class="form-group">
+            <label>Plano *</label>
+            <select id="aluno-plano" required></select>
+          </div>
+          <div class="form-group">
+            <label>Data Início *</label>
+            <input type="date" id="aluno-data-inicio" required>
+          </div>
+          <div class="form-group">
+            <label>Data Fim</label>
+            <input type="date" id="aluno-data-fim">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="aluno-status">
+              <option value="ativo">Ativo</option>
+              <option value="inativo">Inativo</option>
+              <option value="pendente">Pendente</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-aluno')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">💾 Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Plano -->
+  <div id="modal-plano" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-plano-titulo">Novo Plano</h3>
+        <button class="btn-close" onclick="closeModal('modal-plano')">&times;</button>
+      </div>
+      <form id="form-plano" onsubmit="salvarPlano(event)">
+        <input type="hidden" id="plano-id">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nome do Plano *</label>
+            <input type="text" id="plano-nome" required>
+          </div>
+          <div class="form-group">
+            <label>Preço (R$) *</label>
+            <input type="number" id="plano-preco" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>Duração (dias) *</label>
+            <input type="number" id="plano-duracao" min="1" required>
+          </div>
+          <div class="form-group">
+            <label>Descrição</label>
+            <input type="text" id="plano-descricao" placeholder="Ex: Musculação + Aulas">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-plano')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">💾 Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Pagamento -->
+  <div id="modal-pagamento" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Registrar Pagamento</h3>
+        <button class="btn-close" onclick="closeModal('modal-pagamento')">&times;</button>
+      </div>
+      <form id="form-pagamento" onsubmit="salvarPagamento(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Aluno *</label>
+            <select id="pagamento-aluno" required></select>
+          </div>
+          <div class="form-group">
+            <label>Valor (R$) *</label>
+            <input type="number" id="pagamento-valor" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>Método de Pagamento *</label>
+            <select id="pagamento-metodo" required>
+              <option value="dinheiro">💵 Dinheiro</option>
+              <option value="cartao_credito">💳 Cartão Crédito</option>
+              <option value="cartao_debito">💳 Cartão Débito</option>
+              <option value="pix">📱 PIX</option>
+              <option value="boleto">📄 Boleto</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-pagamento')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">💾 Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
